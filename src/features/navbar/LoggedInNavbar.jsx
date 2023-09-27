@@ -6,8 +6,8 @@ import { logoutUser } from "../auth/authSlice";
 export default function LoggedInNavbar() {
   const dispatch = useDispatch();
 
-  const userLastName = useSelector(state => state.user?.userLastName);
-  const userFirstName = useSelector(state => state.user?.userFirstName);
+  const userLastName = useSelector(state => state.auth.user.firstName);
+  const userFirstName = useSelector(state => state.auth.user.lastName);
 
   const handleSignOut = () => {
     dispatch(logoutUser());
