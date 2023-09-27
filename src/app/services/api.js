@@ -32,4 +32,4 @@ export const api = createApi({
   }),
 });
 
-export const { useLoginMutation } = api;
+export const { useLoginMutation, useGetProfileQuery } = api;
