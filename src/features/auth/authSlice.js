@@ -4,7 +4,12 @@ import { api } from "../../app/services/api";
 const slice = createSlice({
   name: "auth",
   initialState: { user: null, token: null },
-  reducers: {},
+  reducers: {
+    logoutUser: state => {
+      state.user = null;
+      state.token = null;
+    },
+  },
   extraReducers: builder => {
     builder.addMatcher(api.endpoints.login.matchFulfilled, (state, { payload }) => {
       state.token = payload.body.token;
@@ -14,4 +19,4 @@ const slice = createSlice({
 
 export default slice.reducer;
 
-export const selectCurrentUser = state => state.auth.user;
+export const { logoutUser } = slice.actions;
