@@ -5,6 +5,7 @@ import { store } from "../app/store";
 
 import Login from "../features/auth/Login";
 import Navbar from "../features/navbar/Navbar";
+import Profile from "../features/profile/Profile";
 
 import "./App.css";
 
@@ -15,6 +16,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </Provider>

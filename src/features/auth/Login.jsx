@@ -1,12 +1,12 @@
 import { useState } from "react";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useLoginMutation } from "../../app/services/api";
 
 import "./Login.css";
 
 export default function Login() {
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +17,8 @@ export default function Login() {
   const loginUser = async e => {
     try {
       e.preventDefault();
-      await login({ email, password });
+      await login({ email, password }).unwrap();
+      navigate("/profile");
     } catch (error) {
       console.log(error);
     }

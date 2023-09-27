@@ -19,7 +19,7 @@ export const api = createApi({
         body: credentials,
       }),
     }),
-    getProfile: builder.query({
+    getProfile: builder.mutation({
       query: () => ({ url: "profile", method: "POST" }),
     }),
     updateName: builder.mutation({
@@ -32,4 +32,4 @@ export const api = createApi({
   }),
 });
 
-export const { useLoginMutation, useGetProfileQuery } = api;
+export const { useLoginMutation, useGetProfileMutation, useUpdateNameMutation } = api;
