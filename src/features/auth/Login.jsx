@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useLoginMutation } from "../../app/services/api";
 import { rememberUser } from "./authSlice";
@@ -10,6 +10,8 @@ import "./Login.css";
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const userLastPage = useSelector(state => state.auth.userLastPage);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +24,11 @@ export default function Login() {
       e.preventDefault();
       dispatch(rememberUser(rememberMe));
       await login({ email, password }).unwrap();
-      navigate("/profile");
+      if (userLastPage) {
+        navigate(userLastPage);
+      } else {
+        navigate("/profile");
+      }
     } catch (error) {
       console.log(error);
     }

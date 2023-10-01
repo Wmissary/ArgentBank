@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 
 import { useGetProfileMutation, useUpdateNameMutation } from "../../app/services/api";
+import { setUserLastPage } from "../auth/authSlice";
 
 import "./Profile.css";
 
 export default function Profile() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [editMode, setEditMode] = useState(false);
@@ -17,17 +22,27 @@ export default function Profile() {
   const [updateName] = useUpdateNameMutation();
 
   useEffect(() => {
-    getProfile();
-  }, [getProfile]);
+    getProfile()
+      .unwrap()
+      .catch(() => {
+        dispatch(setUserLastPage("/profile"));
+        navigate("/login");
+      });
+  }, [getProfile, navigate, dispatch]);
 
   const handleEdit = () => {
     setFirstName(userFirstName);
     setLastName(userLastName);
     setEditMode(true);
   };
-  const saveNewName = () => {
-    updateName({ firstName, lastName });
-    setEditMode(false);
+  const saveNewName = async () => {
+    try {
+      await updateName({ firstName, lastName });
+      setEditMode(false);
+    } catch (error) {
+      dispatch(setUserLastPage("/profile"));
+      navigate("/login");
+    }
   };
 
   return (

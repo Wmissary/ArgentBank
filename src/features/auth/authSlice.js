@@ -19,6 +19,7 @@ const initialState = {
   },
   token: getTokenFromStorage(rememberMe) ?? null,
   rememberMe: rememberMe,
+  userLastPage: null,
 };
 
 const slice = createSlice({
@@ -36,6 +37,9 @@ const slice = createSlice({
     },
     rememberUser: (state, { payload }) => {
       state.rememberMe = payload;
+    },
+    setUserLastPage: (state, { payload }) => {
+      state.userLastPage = payload;
     },
   },
   extraReducers: builder => {
@@ -56,4 +60,4 @@ const slice = createSlice({
 
 export default slice.reducer;
 
-export const { logoutUser, rememberUser } = slice.actions;
+export const { logoutUser, rememberUser, setUserLastPage } = slice.actions;
