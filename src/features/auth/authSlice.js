@@ -11,8 +11,6 @@ import {
 } from "../../app/utils/storage";
 
 const rememberMe = localStorage.getItem("token") ? true : false;
-console.log(rememberMe);
-console.log(getTokenFromStorage(rememberMe));
 
 const initialState = {
   user: JSON.parse(getUserFromStorage(rememberMe)) ?? {
