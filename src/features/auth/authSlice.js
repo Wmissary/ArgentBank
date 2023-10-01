@@ -32,8 +32,8 @@ const slice = createSlice({
         lastName: null,
       };
       state.token = null;
-      removeTokenFromStorage(state.rememberMe);
-      removeUserFromStorage(state.rememberMe);
+      removeTokenFromStorage();
+      removeUserFromStorage();
     },
     rememberUser: (state, { payload }) => {
       state.rememberMe = payload;
@@ -51,9 +51,21 @@ const slice = createSlice({
       state.user = { firstName: payload.body.firstName, lastName: payload.body.lastName };
       setUserInStorage(state.rememberMe, JSON.stringify(state.user));
     });
+    builder.addMatcher(api.endpoints.getProfile.matchRejected, state => {
+      state.user = { firstName: null, lastName: null };
+      state.token = null;
+      removeTokenFromStorage();
+      removeUserFromStorage();
+    });
     builder.addMatcher(api.endpoints.updateName.matchFulfilled, (state, { payload }) => {
       state.user = { firstName: payload.body.firstName, lastName: payload.body.lastName };
       setUserInStorage(state.rememberMe, JSON.stringify(state.user));
+    });
+    builder.addMatcher(api.endpoints.updateName.matchRejected, state => {
+      state.user = { firstName: null, lastName: null };
+      state.token = null;
+      removeTokenFromStorage();
+      removeUserFromStorage();
     });
   },
 });
