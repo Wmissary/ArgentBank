@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import { useLoginMutation } from "../../app/services/api";
+import { rememberUser } from "./authSlice";
 
 import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +20,7 @@ export default function Login() {
   const loginUser = async e => {
     try {
       e.preventDefault();
+      dispatch(rememberUser(rememberMe));
       await login({ email, password }).unwrap();
       navigate("/profile");
     } catch (error) {
