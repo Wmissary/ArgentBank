@@ -1,38 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { useLoginMutation } from "../../app/services/api";
-import { rememberUser } from "./authSlice";
+import { setTokenInStorage } from "../../app/utils/storage";
 
 import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const userLastPage = useSelector(state => state.auth.userLastPage);
+  const userIsAuth = useSelector(state => state.auth.isAuth);
+  const lastAuthPageVisitedBeforeLogin = useSelector(state => state.auth.lastAuthPageVisitedBeforeLogin);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState("");
 
   const [login] = useLoginMutation();
+
+  useEffect(() => {
+    if (userIsAuth) {
+      navigate("/profile");
+    }
+  });
 
   const loginUser = async e => {
     try {
       e.preventDefault();
-      dispatch(rememberUser(rememberMe));
-      await login({ email, password }).unwrap();
-      if (userLastPage) {
-        navigate(userLastPage);
+      const { body } = await login({ email, password }).unwrap();
+      setTokenInStorage(body.token, { rememberMe });
+      if (lastAuthPageVisitedBeforeLogin) {
+        navigate(lastAuthPageVisitedBeforeLogin);
       } else {
         navigate("/profile");
       }
     } catch (error) {
-      console.log(error);
+      setError(error.data.message);
     }
   };
+
   return (
     <main className="main bg-dark">
       <section className="sign-in-content">
@@ -53,6 +61,11 @@ export default function Login() {
               required
             />
           </div>
+          {error && (
+            <p className="error" style={{ color: "red" }}>
+              {error}
+            </p>
+          )}
           <div className="input-remember">
             <input
               type="checkbox"

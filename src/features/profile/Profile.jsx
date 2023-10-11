@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { useGetProfileMutation, useUpdateNameMutation } from "../../app/services/api";
-import { setUserLastPage } from "../auth/authSlice";
+import { logout, setLastAuthPageVisitedBeforeLogin } from "../auth/authSlice";
+
+import { setUserInStorage, removeUserFromStorage, removeTokenFromStorage } from "../../app/utils/storage";
 
 import "./Profile.css";
 
@@ -15,32 +17,38 @@ export default function Profile() {
   const [lastName, setLastName] = useState("");
   const [editMode, setEditMode] = useState(false);
 
-  const userFirstName = useSelector(state => state.auth.user.firstName);
-  const userLastName = useSelector(state => state.auth.user.lastName);
-
   const [getProfile] = useGetProfileMutation();
   const [updateName] = useUpdateNameMutation();
 
   useEffect(() => {
     getProfile()
       .unwrap()
+      .then(({ body }) => {
+        setFirstName(body.firstName);
+        setLastName(body.lastName);
+        setUserInStorage(JSON.stringify({ firstName: body.firstName, lastName: body.lastName }));
+      })
       .catch(() => {
-        dispatch(setUserLastPage("/profile"));
+        dispatch(logout());
+        dispatch(setLastAuthPageVisitedBeforeLogin("/profile"));
+        removeUserFromStorage();
+        removeTokenFromStorage();
         navigate("/login");
       });
   }, [getProfile, navigate, dispatch]);
 
   const handleEdit = () => {
-    setFirstName(userFirstName);
-    setLastName(userLastName);
     setEditMode(true);
   };
   const saveNewName = async () => {
     try {
-      await updateName({ firstName, lastName });
+      await updateName({ firstName, lastName }).unwrap();
+      setUserInStorage(JSON.stringify({ firstName, lastName }));
       setEditMode(false);
     } catch (error) {
-      dispatch(setUserLastPage("/profile"));
+      dispatch(logout());
+      removeUserFromStorage();
+      removeTokenFromStorage();
       navigate("/login");
     }
   };
@@ -51,7 +59,7 @@ export default function Profile() {
         <h1>
           Welcome back
           <br />
-          {editMode ? "" : userFirstName + " " + userLastName}
+          {editMode ? "" : firstName + " " + lastName}
         </h1>
         {editMode ? (
           <div>

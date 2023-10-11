@@ -9,7 +9,7 @@ import "./Navbar.css";
 import ArgentBankLogo from "../../assets/argentBankLogo.png";
 
 export default function Navbar() {
-  const userIsLoggedIn = useSelector(state => state.auth.token !== null);
+  const isAuth = useSelector(state => state.auth.isAuth);
 
   return (
     <nav className="main-nav">
@@ -17,7 +17,7 @@ export default function Navbar() {
         <img className="main-nav-logo-image" alt="Argent Bank Logo" src={ArgentBankLogo} />
         <h1 className="sr-only">Argent Bank</h1>
       </Link>
-      {userIsLoggedIn ? <LoggedInNavbar /> : <LoggedOutNavbar />}
+      {isAuth ? <LoggedInNavbar /> : <LoggedOutNavbar />}
     </nav>
   );
 }

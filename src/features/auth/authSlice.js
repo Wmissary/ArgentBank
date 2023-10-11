@@ -1,75 +1,45 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { api } from "../../app/services/api";
 
-import {
-  getTokenFromStorage,
-  setTokenInStorage,
-  removeTokenFromStorage,
-  getUserFromStorage,
-  setUserInStorage,
-  removeUserFromStorage,
-} from "../../app/utils/storage";
+import { getTokenFromStorage } from "../../app/utils/storage";
 
-const rememberMe = localStorage.getItem("token") ? true : false;
+const checkIfAuth = token => (token ? true : false);
 
 const initialState = {
-  user: JSON.parse(getUserFromStorage(rememberMe)) ?? {
-    firstName: null,
-    lastName: null,
-  },
-  token: getTokenFromStorage(rememberMe) ?? null,
-  rememberMe: rememberMe,
-  userLastPage: null,
+  token: getTokenFromStorage(),
+  isAuth: checkIfAuth(getTokenFromStorage()),
+  lastAuthPageVisitedBeforeLogin: null,
 };
 
 const slice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    logoutUser: state => {
-      state.user = {
-        firstName: null,
-        lastName: null,
-      };
+    login: (state, { token }) => {
+      state.token = token;
+      state.isAuth = true;
+    },
+    logout: state => {
       state.token = null;
-      removeTokenFromStorage();
-      removeUserFromStorage();
+      state.isAuth = false;
     },
-    rememberUser: (state, { payload }) => {
-      state.rememberMe = payload;
-    },
-    setUserLastPage: (state, { payload }) => {
-      state.userLastPage = payload;
+    setLastAuthPageVisitedBeforeLogin: (state, { payload }) => {
+      state.lastAuthPageVisitedBeforeLogin = payload;
     },
   },
   extraReducers: builder => {
     builder.addMatcher(api.endpoints.login.matchFulfilled, (state, { payload }) => {
-      state.token = payload.body.token;
-      setTokenInStorage(state.rememberMe, payload.body.token);
-    });
-    builder.addMatcher(api.endpoints.getProfile.matchFulfilled, (state, { payload }) => {
-      state.user = { firstName: payload.body.firstName, lastName: payload.body.lastName };
-      setUserInStorage(state.rememberMe, JSON.stringify(state.user));
+      slice.caseReducers.login(state, { token: payload.body.token });
     });
     builder.addMatcher(api.endpoints.getProfile.matchRejected, state => {
-      state.user = { firstName: null, lastName: null };
-      state.token = null;
-      removeTokenFromStorage();
-      removeUserFromStorage();
-    });
-    builder.addMatcher(api.endpoints.updateName.matchFulfilled, (state, { payload }) => {
-      state.user = { firstName: payload.body.firstName, lastName: payload.body.lastName };
-      setUserInStorage(state.rememberMe, JSON.stringify(state.user));
+      slice.caseReducers.logout(state);
     });
     builder.addMatcher(api.endpoints.updateName.matchRejected, state => {
-      state.user = { firstName: null, lastName: null };
-      state.token = null;
-      removeTokenFromStorage();
-      removeUserFromStorage();
+      slice.caseReducers.logout(state);
     });
   },
 });
 
 export default slice.reducer;
 
-export const { logoutUser, rememberUser, setUserLastPage } = slice.actions;
+export const { login, logout, setLastAuthPageVisitedBeforeLogin } = slice.actions;

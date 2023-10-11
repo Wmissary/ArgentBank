@@ -1,16 +1,19 @@
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
-import { logoutUser } from "../auth/authSlice";
+import { logout } from "../../features/auth/authSlice";
+import { removeTokenFromStorage, removeUserFromStorage } from "../../app/utils/storage";
 
 export default function LoggedInNavbar() {
   const dispatch = useDispatch();
 
-  const userLastName = useSelector(state => state.auth.user.firstName);
-  const userFirstName = useSelector(state => state.auth.user.lastName);
+  const userLastName = useSelector(state => state.profile.firstName);
+  const userFirstName = useSelector(state => state.profile.lastName);
 
   const handleSignOut = () => {
-    dispatch(logoutUser());
+    dispatch(logout());
+    removeTokenFromStorage();
+    removeUserFromStorage();
   };
 
   return (

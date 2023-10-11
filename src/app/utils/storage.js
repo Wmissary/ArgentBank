@@ -1,9 +1,9 @@
-function getTokenFromStorage(rememberMe) {
-  return rememberMe ? localStorage.getItem("token") : sessionStorage.getItem("token");
+function getTokenFromStorage() {
+  return localStorage.getItem("token") ?? sessionStorage.getItem("token") ?? null;
 }
 
-function setTokenInStorage(rememberMe, token) {
-  rememberMe ? localStorage.setItem("token", token) : sessionStorage.setItem("token", token);
+function setTokenInStorage(token, { rememberUser = false } = {}) {
+  rememberUser ? localStorage.setItem("token", token) : sessionStorage.setItem("token", token);
 }
 
 function removeTokenFromStorage() {
@@ -11,12 +11,19 @@ function removeTokenFromStorage() {
   sessionStorage.removeItem("token");
 }
 
-function getUserFromStorage(rememberMe) {
-  return rememberMe ? localStorage.getItem("user") : sessionStorage.getItem("user");
+function getUserFromStorage() {
+  return (
+    localStorage.getItem("user") ??
+    sessionStorage.getItem("user") ??
+    JSON.stringify({
+      firstName: null,
+      lastName: null,
+    })
+  );
 }
 
-function setUserInStorage(rememberMe, user) {
-  rememberMe ? localStorage.setItem("user", user) : sessionStorage.setItem("user", user);
+function setUserInStorage(user, { rememberUser = false } = {}) {
+  rememberUser ? localStorage.setItem("user", user) : sessionStorage.setItem("user", user);
 }
 
 function removeUserFromStorage() {
