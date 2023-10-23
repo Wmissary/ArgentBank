@@ -31,11 +31,7 @@ export default function Login() {
       e.preventDefault();
       const { body } = await login({ email, password }).unwrap();
       setTokenInStorage(body.token, { rememberMe });
-      if (lastAuthPageVisitedBeforeLogin) {
-        navigate(lastAuthPageVisitedBeforeLogin);
-      } else {
-        navigate("/profile");
-      }
+      navigate(lastAuthPageVisitedBeforeLogin ?? "/profile");
     } catch (error) {
       setError(error.data.message);
     }

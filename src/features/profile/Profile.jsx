@@ -19,6 +19,7 @@ export default function Profile() {
 
   const [getProfile] = useGetProfileMutation();
   const [updateName] = useUpdateNameMutation();
+  const rememberMe = localStorage.getItem("token") ? true : false;
 
   useEffect(() => {
     getProfile()
@@ -26,7 +27,7 @@ export default function Profile() {
       .then(({ body }) => {
         setFirstName(body.firstName);
         setLastName(body.lastName);
-        setUserInStorage(JSON.stringify({ firstName: body.firstName, lastName: body.lastName }));
+        setUserInStorage(JSON.stringify({ firstName: body.firstName, lastName: body.lastName }), { rememberMe });
       })
       .catch(() => {
         dispatch(logout());
@@ -35,7 +36,7 @@ export default function Profile() {
         removeTokenFromStorage();
         navigate("/login");
       });
-  }, [getProfile, navigate, dispatch]);
+  }, [getProfile, navigate, dispatch, rememberMe]);
 
   const handleEdit = () => {
     setEditMode(true);
@@ -43,7 +44,7 @@ export default function Profile() {
   const saveNewName = async () => {
     try {
       await updateName({ firstName, lastName }).unwrap();
-      setUserInStorage(JSON.stringify({ firstName, lastName }));
+      setUserInStorage(JSON.stringify({ firstName, lastName }), { rememberMe });
       setEditMode(false);
     } catch (error) {
       dispatch(logout());
